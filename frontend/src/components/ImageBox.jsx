@@ -136,7 +136,7 @@ function ImageBox({
       ctx.strokeStyle = "rgba(0, 0, 0, 1)";
       ctx.globalCompositeOperation = "source-over";
     } else if (tool === "highlighter") {
-      ctx.strokeStyle = "rgba(255, 255, 0, 0.1)";
+      ctx.strokeStyle = "rgba(255, 255, 0, 0.5)";
       ctx.globalCompositeOperation = "source-over";
     } else if (tool === "eraser") {
       ctx.strokeStyle = "rgba(0, 0, 0, 1)";
@@ -145,7 +145,7 @@ function ImageBox({
   };
 
   const draw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawing || !imgSrc) return;
 
     const canvas = drawingCanvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -154,9 +154,16 @@ function ImageBox({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    updateMask();
+    // For highlighter: draw short segments
+    if (tool === "highlighter") {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y); // Tiny segment
+      ctx.stroke();
+    } else {
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
   };
 
   const stopDrawing = () => {
