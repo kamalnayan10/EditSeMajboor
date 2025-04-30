@@ -14,49 +14,61 @@ function Navbar({ tool, changeTool, brushSize, changeBrushSize }) {
       className="flex md:flex-col flex-row 
                 md:h-full h-16 
                 md:w-1/8 w-full 
-                bg-dark-pink 
+                bg-dark-pink
                 z-10
                 justify-center md:justify-start
-                items-center p-2 md:p-6 gap-10 rounded-r-md"
+                items-center p-2 md:p-6 gap-6 md:gap-10 rounded-r-md"
     >
-      <NavButton text="Clear Everything">
+      <NavButton text="Clear Everything" onClick={() => console.log("Clear")}>
         <FaTrash />
       </NavButton>
-      <NavButton text="Undo">
+      <NavButton text="Undo" onClick={() => console.log("Undo")}>
         <ImUndo2 />
       </NavButton>
       <NavButton
         text="Auto Selector"
-        tool={tool}
+        currentTool={tool}
         onClick={() => changeTool("selector")}
       >
         <FaMagic />
       </NavButton>
       <NavButton
         text="Highlighter"
-        tool={tool}
+        currentTool={tool}
         onClick={() => changeTool("highlighter")}
       >
         <FaHighlighter />
       </NavButton>
-      <NavButton text="Pen" tool={tool} onClick={() => changeTool("pen")}>
+      <NavButton
+        text="Pen"
+        currentTool={tool}
+        onClick={() => changeTool("pen")}
+      >
         <HiPaintBrush />
       </NavButton>
-      <NavButton text="Eraser" tool={tool} onClick={() => changeTool("eraser")}>
+      <NavButton
+        text="Eraser"
+        currentTool={tool}
+        onClick={() => changeTool("eraser")}
+      >
         <BsFillEraserFill />
       </NavButton>
-      <div className="flex flex-col items-center justify-center gap-4">
-        <label htmlFor="time-slider">Brush Size</label>
+      {/* Brush Size Slider */}
+      <div className="flex flex-col items-center justify-center w-full gap-2">
+        <label htmlFor="brush-slider" className="text-white text-sm">
+          Brush Size: {brushSize}
+        </label>
         <input
           type="range"
-          id="time-slider"
-          min="10"
-          max="100"
-          step={brushSize}
+          id="brush-slider"
+          min="1"
+          max="10"
+          value={parseInt(brushSize / 10, 10)}
+          step="1"
           onChange={changeBrushSize}
-          className="slider"
+          className="slider w-full"
         />
-      </div>
+      </div>{" "}
     </div>
   );
 }

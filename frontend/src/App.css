@@ -14,40 +14,37 @@
   --font-roboto: "Roboto", sans-serif;
 }
 
-input[type="range"].slider {
+.slider {
   -webkit-appearance: none;
   appearance: none;
   background: #ffa6be;
-  width: 100%;
   height: 8px;
   border-radius: 5px;
   outline: none;
 }
 
-input[type="range"].slider::-webkit-slider-thumb {
+.slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   background: #ffedfa;
-  cursor: pointer;
+  cursor: ew-resize;
   border: 2px solid #ffb8e0;
 }
 
-/* For Firefox compatibility */
-input[type="range"].slider::-moz-range-thumb {
+.slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
   background: #ffedfa;
-  cursor: pointer;
+  cursor: ew-resize;
   border: 2px solid #ffb8e0;
 }
 
-/* For the track in Firefox */
-input[type="range"].slider::-moz-range-track {
-  background: #e73e6e;
+.slider::-moz-range-track {
+  background: #ffa6be;
   height: 8px;
   border-radius: 5px;
 }

@@ -8,15 +8,18 @@ function Main() {
   const [maskBlob, setMaskBlob] = useState(null);
   const [tool, setTool] = useState("pen"); // can have values - pen, highlighter, selector, eraser
   const [brushSize, setBrushSize] = useState(10);
+  const [prompt, setPrompt] = useState("");
 
   const handleImageUpload = (imageData) => {
     setImgSrc(imageData.src);
-    // You can also store original dimensions if needed
+  };
+
+  const handlePrompt = (e) => {
+    setPrompt(e.target.value);
   };
 
   const handleMaskUpdate = (blob) => {
     setMaskBlob(blob);
-    // You can also send to API or process immediately
   };
 
   const changeTool = (toolName) => {
@@ -24,8 +27,43 @@ function Main() {
   };
 
   const changeBrushSize = (e) => {
-    const value = parseInt(e.target.value, 10);
+    const value = parseInt(e.target.value * 10, 10);
     setBrushSize(value);
+  };
+
+  const handleSubmit = () => {
+    if (!imgSrc || !maskBlob) {
+      alert(
+        !imgSrc ? "Please upload an image first" : "Please create a mask first"
+      );
+      return;
+    }
+
+    // Create download links for both files
+    const downloadFile = (blob, filename) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    // Download original image
+    fetch(imgSrc)
+      .then((res) => res.blob())
+      .then((blob) => {
+        downloadFile(blob, "original_image.png");
+
+        // Download mask
+        downloadFile(maskBlob, "image_mask.png");
+      })
+      .catch((error) => {
+        console.error("Error downloading files:", error);
+        alert("Error saving files");
+      });
   };
 
   return (
@@ -44,7 +82,11 @@ function Main() {
           onImageUpload={handleImageUpload}
           onMaskUpdate={handleMaskUpdate}
         />
-        <PromptBox />
+        <PromptBox
+          handleSubmit={handleSubmit}
+          prompt={prompt}
+          handlePrompt={handlePrompt}
+        />
       </div>
     </div>
   );

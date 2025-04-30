@@ -156,12 +156,12 @@ function ImageBox({
 
     ctx.lineTo(x, y);
     ctx.stroke();
-    updateMask(); // Update mask continuously while drawing
+    updateMask();
   };
 
   const stopDrawing = () => {
     setIsDrawing(false);
-    updateMask(); // Final update when drawing stops
+    updateMask();
   };
 
   const handleClick = () => {
@@ -220,11 +220,11 @@ function ImageBox({
           </>
         ) : (
           <div
-            className={`text-gray-500 text-center flex flex-col items-center justify-center p-10
-              border-2 border-dashed border-gray-300
-              rounded-lg
+            className="text-gray-500 text-center flex flex-col items-center justify-center p-10
+              border-2 border-dashed border-gray-300 duration-300
+              rounded-lg hover:text-med-pink
               hover:border-med-pink cursor-pointer
-            `}
+            "
           >
             <BiSolidImageAdd className="text-9xl text-dark-pink" />
             <p>Drag & drop an image here</p>

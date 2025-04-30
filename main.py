@@ -81,4 +81,4 @@ if __name__ == "__main__":
 
     # instructPix2Pix(IMG_PATH, PROMPT)
     # inpaint(IMG_PATH,IMG_MASK_PATH)
-    outpaint(IMG_PATH)
+    # outpaint(IMG_PATH)
