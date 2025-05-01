@@ -8,7 +8,7 @@ import { FaHighlighter } from "react-icons/fa";
 import { HiPaintBrush } from "react-icons/hi2";
 import { BsFillEraserFill } from "react-icons/bs";
 
-function Navbar({ tool, changeTool, brushSize, changeBrushSize }) {
+function Navbar({ tool, changeTool, brushSize, changeBrushSize, onClear }) {
   return (
     <div
       className="flex md:flex-col flex-row 
@@ -19,11 +19,8 @@ function Navbar({ tool, changeTool, brushSize, changeBrushSize }) {
                 justify-center md:justify-start
                 items-center p-2 md:p-6 gap-6 md:gap-10 rounded-r-md"
     >
-      <NavButton text="Clear Everything" onClick={() => console.log("Clear")}>
+      <NavButton text="Clear Everything" onClick={onClear}>
         <FaTrash />
-      </NavButton>
-      <NavButton text="Undo" onClick={() => console.log("Undo")}>
-        <ImUndo2 />
       </NavButton>
       <NavButton
         text="Auto Selector"

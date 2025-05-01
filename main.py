@@ -75,10 +75,10 @@ def outpaint(img_path, prompt="""expand the landscape naturally, ultra realistic
 
 
 if __name__ == "__main__":
-    IMG_PATH = "images/building.jpg"
-    IMG_MASK_PATH = "images/buildingMask.png"
-    PROMPT = "add a football stadium or some part of it"
+    IMG_PATH = "images/hat.jpg"
+    IMG_MASK_PATH = "images/hatMask.png"
+    PROMPT = "add a yellow flower"
 
     # instructPix2Pix(IMG_PATH, PROMPT)
-    # inpaint(IMG_PATH,IMG_MASK_PATH)
+    inpaint(IMG_PATH,IMG_MASK_PATH, PROMPT)
     # outpaint(IMG_PATH)

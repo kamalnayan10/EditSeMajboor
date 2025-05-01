@@ -7,6 +7,8 @@ function ImageBox({
   imgSrc, // Receive image source from parent
   onImageUpload, // Callback when image is uploaded
   onMaskUpdate, // Callback when mask is updated
+  clear,
+  onClear,
 }) {
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -123,11 +125,7 @@ function ImageBox({
     ctx.beginPath();
     ctx.moveTo(x, y);
 
-    const scaleFactor = Math.min(
-      canvas.width / originalDimensionsRef.current.width,
-      canvas.height / originalDimensionsRef.current.height
-    );
-    ctx.lineWidth = brushSize * scaleFactor;
+    ctx.lineWidth = brushSize;
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -158,7 +156,7 @@ function ImageBox({
     if (tool === "highlighter") {
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x, y); // Tiny segment
+      ctx.lineTo(x, y);
       ctx.stroke();
     } else {
       ctx.lineTo(x, y);
@@ -169,6 +167,21 @@ function ImageBox({
   const stopDrawing = () => {
     setIsDrawing(false);
     updateMask();
+  };
+
+  useEffect(() => {
+    if (clear) {
+      clearDrawing();
+      onClear(false);
+    }
+  }, [clear, onClear]);
+
+  const clearDrawing = () => {
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+
+    ctx.clearRect(0, 0, rect.width, rect.height);
   };
 
   const handleClick = () => {

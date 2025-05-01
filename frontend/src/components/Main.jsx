@@ -9,6 +9,11 @@ function Main() {
   const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
   const [brushSize, setBrushSize] = useState(10);
   const [prompt, setPrompt] = useState("");
+  const [clear, setClear] = useState(false);
+
+  const handleClear = (c) => {
+    setClear(c);
+  };
 
   useEffect(() => {
     const CURSORS = {
@@ -16,7 +21,7 @@ function Main() {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <!-- Arrow pointer with dot -->
                 <path d="M10 4L8 4 8 16 4 12 2 14 12 24 14 22 6 14 16 14 16 12 10 12z" 
-                     fill="black" opacity="0.8"/>
+                     fill="#e73e6e" opacity="1"/>
                 <circle cx="5" cy="5" r="2" fill="black"/>
               </svg>`,
         hotspot: [1, 1], // Tip of the arrow
@@ -24,18 +29,15 @@ function Main() {
       },
       pen: {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75 1.85-1.83zM3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z" 
-                     fill="black" opacity="0.8"/>
+                <circle cx="12" cy="12" r="10" fill="black" opacity="1"/>
               </svg>`,
-        hotspot: [4, 22], // Tip of the pen
+        hotspot: [brushSize / 2, brushSize / 2], // Center
       },
       highlighter: {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M15 14.5V12h2.5l-6-6H9v2.5l6 6zm4.5-10.5L19 3c-.55-.55-1.45-.55-2 0l-1.5 1.5 3 3L20 5c.55-.55.55-1.45 0-2zM9.5 14.5v-3l-4.5 4.5v3h3l4.5-4.5z" 
-                     fill="#FFFF00" opacity="0.5"/>
-                <path d="M6.5 17.5h3l4.5-4.5v-3l-4.5 4.5h-3z" fill="#FFFF00"/>
+                <circle cx="12" cy="12" r="10" fill="yellow" opacity="0.6"/>
               </svg>`,
-        hotspot: [4, 20], // Tip of the highlighter
+        hotspot: [brushSize / 2, brushSize / 2], // Center
       },
       eraser: {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -49,7 +51,7 @@ function Main() {
 
     if (["pen", "highlighter", "eraser", "selector"].includes(tool)) {
       const cursor = CURSORS[tool];
-      const size = tool === "eraser" ? brushSize : 30; // Only eraser uses brushSize
+      const size = tool === "selector" ? 30 : brushSize; // Only eraser uses brushSize
 
       let style = document.getElementById(styleId);
       if (!style) {
@@ -100,13 +102,69 @@ function Main() {
     setBrushSize(value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!imgSrc || !maskBlob) {
       alert(
         !imgSrc ? "Please upload an image first" : "Please create a mask first"
       );
       return;
     }
+
+    // Function to process the mask blob
+    const processMask = async (blob) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+          // Draw the image
+          ctx.drawImage(img, 0, 0);
+
+          // Get image data
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          // Process each pixel
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3]; // alpha channel
+
+            // Enhanced yellow detection (strict RGB ranges for yellow)
+            // Yellow typically has high R+G and low B, with possible transparency
+            const isYellow =
+              r >= 200 && // High red
+              g >= 200 && // High green
+              b <= 100 && // Low blue
+              a > 50; // Not too transparent
+
+            // Set to pure white or pure black
+            const val = isYellow ? 255 : 0;
+            data[i] = val; // R
+            data[i + 1] = val; // G
+            data[i + 2] = val; // B
+            data[i + 3] = 255; // Force full opacity
+          }
+
+          // Put the processed data back
+          ctx.putImageData(imageData, 0, 0);
+
+          // Convert back to blob
+          canvas.toBlob((processedBlob) => {
+            URL.revokeObjectURL(url);
+            resolve(processedBlob);
+          }, "image/png");
+        };
+
+        img.src = url;
+      });
+    };
 
     // Create download links for both files
     const downloadFile = (blob, filename) => {
@@ -120,19 +178,18 @@ function Main() {
       URL.revokeObjectURL(url);
     };
 
-    // Download original image
-    fetch(imgSrc)
-      .then((res) => res.blob())
-      .then((blob) => {
-        downloadFile(blob, "original_image.png");
+    try {
+      // Download original image
+      const originalBlob = await fetch(imgSrc).then((res) => res.blob());
+      downloadFile(originalBlob, "original_image.png");
 
-        // Download mask
-        downloadFile(maskBlob, "image_mask.png");
-      })
-      .catch((error) => {
-        console.error("Error downloading files:", error);
-        alert("Error saving files");
-      });
+      // Process and download mask
+      const processedMaskBlob = await processMask(maskBlob);
+      downloadFile(processedMaskBlob, "image_mask.png");
+    } catch (error) {
+      console.error("Error downloading files:", error);
+      alert("Error saving files");
+    }
   };
 
   return (
@@ -142,6 +199,7 @@ function Main() {
         changeTool={changeTool}
         brushSize={brushSize}
         changeBrushSize={changeBrushSize}
+        onClear={handleClear}
       />
       <div className="w-full h-full">
         <ImageBox
@@ -150,6 +208,8 @@ function Main() {
           imgSrc={imgSrc}
           onImageUpload={handleImageUpload}
           onMaskUpdate={handleMaskUpdate}
+          clear={clear}
+          onClear={handleClear}
         />
         <PromptBox
           handleSubmit={handleSubmit}
