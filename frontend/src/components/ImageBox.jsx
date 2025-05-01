@@ -177,6 +177,14 @@ function ImageBox({
   }, [clear, onClear]);
 
   const clearDrawing = () => {
+    if (
+      !imgSrc ||
+      !imageCanvasRef.current ||
+      !drawingCanvasRef.current ||
+      !containerRef.current
+    )
+      return;
+
     const canvas = drawingCanvasRef.current;
     const ctx = canvas.getContext("2d");
     const rect = canvas.getBoundingClientRect();
