@@ -17,7 +17,7 @@ function Navbar({
   handleScribble,
 }) {
   return (
-    <div className="bg-light-pink md:bg-dark-pink p-3 md:w-1/8 w-full md:h-full">
+    <div className="bg-light-pink md:bg-dark-pink p-3 md:w-1/3 lg:w-1/8 w-full md:h-full">
       <div
         className="flex md:flex-col flex-row flex-wrap 
             md:h-full
