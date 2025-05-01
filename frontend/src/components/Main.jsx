@@ -6,14 +6,11 @@ import PromptBox from "./PromptBox";
 function Main() {
   const [imgSrc, setImgSrc] = useState(null);
   const [maskBlob, setMaskBlob] = useState(null);
-  const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
-  const [brushSize, setBrushSize] = useState(10);
-  const [prompt, setPrompt] = useState("");
+  const [brushSize, setBrushSize] = useState(60);
   const [clear, setClear] = useState(false);
-
-  const handleClear = (c) => {
-    setClear(c);
-  };
+  const [isScribble, setIsScribble] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
 
   useEffect(() => {
     const CURSORS = {
@@ -29,7 +26,7 @@ function Main() {
       },
       pen: {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="black" opacity="1"/>
+                <circle cx="12" cy="12" r="10" fill="red" opacity="1"/>
               </svg>`,
         hotspot: [brushSize / 2, brushSize / 2], // Center
       },
@@ -81,6 +78,14 @@ function Main() {
     };
   }, [tool, brushSize]);
 
+  const handleClear = (c) => {
+    setClear(c);
+  };
+
+  const handleScribble = () => {
+    setIsScribble((scribble) => !scribble);
+  };
+
   const handleImageUpload = (imageData) => {
     setImgSrc(imageData.src);
   };
@@ -129,27 +134,52 @@ function Main() {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = imageData.data;
 
-          // Process each pixel
-          for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            const a = data[i + 3]; // alpha channel
+          if (!isScribble) {
+            // Process each pixel
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              const a = data[i + 3]; // alpha channel
 
-            // Enhanced yellow detection (strict RGB ranges for yellow)
-            // Yellow typically has high R+G and low B, with possible transparency
-            const isYellow =
-              r >= 200 && // High red
-              g >= 200 && // High green
-              b <= 100 && // Low blue
-              a > 50; // Not too transparent
+              // Enhanced yellow detection (strict RGB ranges for yellow)
+              // Yellow typically has high R+G and low B, with possible transparency
+              const isYellow =
+                r >= 200 && // High red
+                g >= 200 && // High green
+                b <= 100 && // Low blue
+                a > 50; // Not too transparent
 
-            // Set to pure white or pure black
-            const val = isYellow ? 255 : 0;
-            data[i] = val; // R
-            data[i + 1] = val; // G
-            data[i + 2] = val; // B
-            data[i + 3] = 255; // Force full opacity
+              // Set to pure white or pure black
+              const val = isYellow ? 255 : 0;
+              data[i] = val; // R
+              data[i + 1] = val; // G
+              data[i + 2] = val; // B
+              data[i + 3] = 255; // Force full opacity
+            }
+          } else {
+            // Process each pixel
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              const a = data[i + 3]; // alpha channel
+
+              // Enhanced yellow detection (strict RGB ranges for yellow)
+              // Yellow typically has high R+G and low B, with possible transparency
+              const isRed =
+                r >= 200 && // High red
+                g <= 100 && // High green
+                b <= 100 && // Low blue
+                a > 50; // Not too transparent
+
+              // Set to pure white or pure black
+              const val = isRed ? 255 : 0;
+              data[i] = val; // R
+              data[i + 1] = val; // G
+              data[i + 2] = val; // B
+              data[i + 3] = 255; // Force full opacity
+            }
           }
 
           // Put the processed data back
@@ -193,13 +223,15 @@ function Main() {
   };
 
   return (
-    <div className="bg-white h-full w-full flex flex-col md:flex-row">
+    <div className="bg-white h-full w-full flex flex-col-reverse md:flex-row">
       <Navbar
         tool={tool}
         changeTool={changeTool}
         brushSize={brushSize}
         changeBrushSize={changeBrushSize}
         onClear={handleClear}
+        scribble={isScribble}
+        handleScribble={handleScribble}
       />
       <div className="w-full h-full">
         <ImageBox

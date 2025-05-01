@@ -131,13 +131,13 @@ function ImageBox({
     ctx.lineJoin = "round";
 
     if (tool === "pen") {
-      ctx.strokeStyle = "rgba(0, 0, 0, 1)";
+      ctx.strokeStyle = "rgba(255, 0, 0, 1)";
       ctx.globalCompositeOperation = "source-over";
     } else if (tool === "highlighter") {
       ctx.strokeStyle = "rgba(255, 255, 0, 0.5)";
       ctx.globalCompositeOperation = "source-over";
     } else if (tool === "eraser") {
-      ctx.strokeStyle = "rgba(0, 0, 0, 1)";
+      ctx.strokeStyle = "rgba(255, 0, 0, 1)";
       ctx.globalCompositeOperation = "destination-out";
     }
   };
@@ -201,6 +201,33 @@ function ImageBox({
     handleFile(e.dataTransfer.files?.[0]);
   };
 
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: () => {},
+    };
+    startDrawing(mouseEvent);
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: () => {},
+    };
+    draw(mouseEvent);
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    stopDrawing();
+  };
+
   return (
     <div className="flex flex-col h-10/12 w-full">
       <div
@@ -210,6 +237,7 @@ function ImageBox({
           flex items-center justify-center
           relative
           ${imgSrc ? "cursor-crosshair" : "cursor-pointer"}
+          min-h-[300px] md:min-h-[400px] lg:min-h-[500px]
         `}
         onClick={handleClick}
         onDragOver={handleDragOver}
@@ -227,28 +255,36 @@ function ImageBox({
           <>
             <canvas
               ref={imageCanvasRef}
-              className="absolute max-h-full max-w-full"
+              className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
             />
             <canvas
               ref={drawingCanvasRef}
-              className="absolute max-h-full max-w-full"
+              className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
               onMouseDown={startDrawing}
               onMouseMove={draw}
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             />
           </>
         ) : (
           <div
-            className="text-gray-500 text-center flex flex-col items-center justify-center p-10
+            className="text-gray-500 text-center flex flex-col items-center justify-center p-6 md:p-10
               border-2 border-dashed border-gray-300 duration-300
-              rounded-lg hover:text-med-pink
+              rounded-lg hover:text-med-pink mx-4
               hover:border-med-pink cursor-pointer
+              
             "
           >
-            <BiSolidImageAdd className="text-9xl text-dark-pink" />
-            <p>Drag & drop an image here</p>
-            <p>or click to select</p>
+            <BiSolidImageAdd className="text-6xl md:text-8xl lg:text-9xl text-dark-pink" />
+            <p className="text-sm md:text-base lg:text-lg">
+              Drag & drop an image here
+            </p>
+            <p className="text-sm md:text-base lg:text-lg">
+              or click to select
+            </p>
           </div>
         )}
       </div>

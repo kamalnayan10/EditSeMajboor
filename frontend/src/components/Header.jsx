@@ -4,17 +4,25 @@ import { GiBowTieRibbon } from "react-icons/gi";
 
 function Header() {
   return (
-    <div className="flex w-full bg-light-pink p-10 justify-between items-center">
-      <h1 className="font-cal-sans text-5xl text-dark-pink font-extrabold flex gap-5">
-        <GiBowTieRibbon />
+    <div className="flex w-full bg-light-pink p-4 md:p-6 lg:p-10 justify-between items-center flex-col sm:flex-row gap-4 sm:gap-0">
+      <h1 className="font-cal-sans text-3xl sm:text-4xl lg:text-5xl text-dark-pink font-extrabold flex gap-2 sm:gap-5 items-center">
+        <GiBowTieRibbon className="text-2xl sm:text-3xl lg:text-4xl" />
         Pookie Edit
-        <GiBowTieRibbon />
+        <GiBowTieRibbon className="text-2xl sm:text-3xl lg:text-4xl" />
       </h1>
-      <div className="flex gap-4">
-        <button className="bg-dark-pink text-white px-5 py-2 hover:cursor-pointer text-xl rounded-full flex items-center justify-center gap-2">
-          <MdAdd /> New Image
+      <div className="flex gap-2 sm:gap-4">
+        <button
+          className="bg-dark-pink text-white px-3 py-1 sm:px-4 sm:py-1.5 md:px-5 md:py-2 hover:cursor-pointer
+        text-base sm:text-lg md:text-xl rounded-full flex items-center justify-center gap-1 sm:gap-2"
+        >
+          <MdAdd className="text-lg sm:text-xl" />
+          <span className="hidden xs:inline">New Image</span>
+          <span className="xs:hidden">New</span>
         </button>
-        <button className="bg-dark-pink text-white px-5 py-2 hover:cursor-pointer text-xl rounded-full hidden">
+        <button
+          className="bg-dark-pink text-white px-3 py-1 sm:px-4 sm:py-1.5 md:px-5 md:py-2 hover:cursor-pointer
+        text-base sm:text-lg md:text-xl rounded-full hidden"
+        >
           Download
         </button>
       </div>

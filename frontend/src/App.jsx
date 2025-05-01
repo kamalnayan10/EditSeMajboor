@@ -4,7 +4,10 @@ import Main from "./components/Main";
 
 function App() {
   return (
-    <div className="h-screen bg-white-pink flex justify-start items-center flex-col font-roboto text-white">
+    <div
+      className="h-screen bg-white-pink flex justify-start
+    items-center flex-col font-roboto text-white overflow-x-hidden"
+    >
       <Header />
       <Main />
     </div>
