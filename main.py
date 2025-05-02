@@ -1,15 +1,43 @@
-from diffusers import StableDiffusionInpaintPipeline
+from diffusers import StableDiffusionInpaintPipeline,StableDiffusionXLInpaintPipeline
 import torch
 from PIL import Image, ImageOps
 
 
+# def inpaint(img, img_mask, prompt = "natural background, realistic, detailed, seamless continuation",
+#             negative_prompt = "blurry, distorted, unrealistic, cartoonish, low quality", img_path = "processed/result.png"):
+
+#     pipe = StableDiffusionInpaintPipeline.from_single_file(
+#         "weights/realisticVisionV60B1_v51HyperInpaintVAE.safetensors",
+#         torch_dtype=torch.float16,
+#         use_safetensors=True,
+#     ).to("cuda")
+
+#     # pipe.enable_vae_tiling()
+
+#     img = Image.open(img).convert("RGB")
+#     img_mask = Image.open(img_mask).convert("L")
+
+#     image = pipe(
+#         negative_prompt = negative_prompt,
+#         prompt=prompt,
+#         image=img,
+#         mask_image=img_mask,
+#         num_inference_steps=50,
+#         strength = 1,
+#         guidance_scale=8
+#     ).images[0]
+
+#     image = image.resize(img.size)
+
+#     image.save(img_path)
+
 def inpaint(img, img_mask, prompt = "natural background, realistic, detailed, seamless continuation",
             negative_prompt = "blurry, distorted, unrealistic, cartoonish, low quality", img_path = "processed/result.png"):
 
-    pipe = StableDiffusionInpaintPipeline.from_single_file(
-        "weights/realisticVisionV60B1_v51HyperInpaintVAE.safetensors",
+    pipe = StableDiffusionXLInpaintPipeline.from_single_file(
+        "weights/sd_xl_refiner_1.0.safetensors",
         torch_dtype=torch.float16,
-        use_safetensors=True,
+        variant="fp16",
     ).to("cuda")
 
     # pipe.enable_vae_tiling()
@@ -23,12 +51,14 @@ def inpaint(img, img_mask, prompt = "natural background, realistic, detailed, se
         image=img,
         mask_image=img_mask,
         num_inference_steps=50,
+        strength = 1,
         guidance_scale=8
     ).images[0]
 
     image = image.resize(img.size)
 
     image.save(img_path)
+
 
 
 def outpaint(img_path, prompt="""expand the landscape naturally, ultra realistic, seamless blending,
@@ -80,5 +110,15 @@ if __name__ == "__main__":
     PROMPT = "add a yellow flower"
 
     # instructPix2Pix(IMG_PATH, PROMPT)
-    inpaint(IMG_PATH,IMG_MASK_PATH, PROMPT)
+    # inpaint(IMG_PATH,IMG_MASK_PATH, PROMPT)
+    # inpaint_external(IMG_PATH,IMG_MASK_PATH, PROMPT)
     # outpaint(IMG_PATH)
+
+    from huggingface_hub import snapshot_download
+
+    # Download the entire model (including safetensors)
+    snapshot_download(
+        repo_id="kandinsky-community/kandinsky-2-2-decoder-inpaint",
+        local_dir="weights/kandinsky-2-2-decoder-inpaint",
+        ignore_patterns=["*.msgpack", "*.bin"],  # Optional: Exclude non-essential files
+    )

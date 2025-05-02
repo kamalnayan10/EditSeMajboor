@@ -1,5 +1,5 @@
 # fastapi_server.py
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import shutil
@@ -26,6 +26,7 @@ os.makedirs(PROCESSED_DIR, exist_ok=True)
 async def upload_image(
     image: UploadFile = File(...),
     mask: UploadFile = File(...),
+    prompt: str = Form(None),
 ):
     # Save original image
     image_path = os.path.join(UPLOAD_DIR, image.filename)
@@ -38,7 +39,10 @@ async def upload_image(
         shutil.copyfileobj(mask.file, f)
 
     # (Optionally) simulate processing
-    inpaint(image_path, mask_path)
+    if prompt:
+        inpaint(image_path, mask_path, prompt)
+    else:
+        inpaint(image_path, mask_path)
 
     return {"url": f"/processed/result.png"}
 

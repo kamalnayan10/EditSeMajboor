@@ -8,7 +8,7 @@ function Header() {
       className="flex w-full bg-light-pink p-4 md:p-6 lg:p-10 justify-between items-center flex-col sm:flex-row gap-4
     sm:gap-0 rounded-b-full md:rounded-none"
     >
-      <h1 className="font-cal-sans text-3xl sm:text-4xl lg:text-5xl text-dark-pink font-extrabold flex gap-2 sm:gap-5 items-center">
+      <h1 className="nosifer-regular text-3xl sm:text-4xl lg:text-5xl text-dark-pink font-extrabold flex gap-2 sm:gap-5 items-center">
         <GiBowTieRibbon className="text-2xl sm:text-3xl lg:text-4xl" />
         Pookie Edit
         <GiBowTieRibbon className="text-2xl sm:text-3xl lg:text-4xl" />

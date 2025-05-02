@@ -12,7 +12,7 @@ function Main() {
   const [clear, setClear] = useState(false);
   const [isScribble, setIsScribble] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(null);
   const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
 
   useEffect(() => {
@@ -211,6 +211,7 @@ function Main() {
       const formData = new FormData();
       formData.append("image", originalBlob, "input.png");
       formData.append("mask", processedMaskBlob, "inputMask.png");
+      formData.append("prompt", prompt);
 
       const uploadRes = await fetch("http://localhost:8000/upload", {
         method: "POST",

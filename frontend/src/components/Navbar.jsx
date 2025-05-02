@@ -5,6 +5,8 @@ import { HiPaintBrush } from "react-icons/hi2";
 import { BsFillEraserFill } from "react-icons/bs";
 import { FaChevronUp } from "react-icons/fa";
 
+// change highlighter tool into two - replace(anything inside mask gets edited) and preserve(anything outside mask gets edited)
+
 function Navbar({
   tool,
   changeTool,
