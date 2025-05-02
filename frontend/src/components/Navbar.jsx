@@ -1,11 +1,9 @@
 import React from "react";
 import NavButton from "./NavButton";
-
-import { FaTrash } from "react-icons/fa";
-import { FaMagic } from "react-icons/fa";
-import { FaHighlighter } from "react-icons/fa";
+import { FaTrash, FaMagic, FaHighlighter } from "react-icons/fa";
 import { HiPaintBrush } from "react-icons/hi2";
 import { BsFillEraserFill } from "react-icons/bs";
+import { FaChevronUp } from "react-icons/fa";
 
 function Navbar({
   tool,
@@ -15,23 +13,31 @@ function Navbar({
   onClear,
   scribble,
   handleScribble,
+  navOpen,
+  handleNavOpen,
 }) {
   return (
-    <div className="bg-light-pink md:bg-dark-pink p-3 md:w-1/3 lg:w-1/8 w-full md:h-full">
-      <div
-        className="flex md:flex-col flex-row flex-wrap 
-            md:h-full
-            w-full 
-            bg-dark-pink
-            z-10
-            justify-center md:justify-start
-            items-center p-5 md:p-6 gap-2 md:gap-10 md:rounded-r-md md:rounded-none rounded-4xl"
+    <div className="bg-light-pink md:bg-dark-pink p-3 w-full md:w-1/3 lg:w-1/8 md:h-full">
+      {/* Mobile Toggle Button - always visible on mobile */}
+      <button
+        onClick={handleNavOpen}
+        className={` ${navOpen ? "rounded-t-4xl" : "rounded-4xl"}
+          md:hidden w-full bg-dark-pink text-white py-2 px-4 flex justify-center items-center `}
       >
-        <NavButton
-          text="Clear Everything"
-          onClick={onClear}
-          isActive={false} // Clear button typically shouldn't stay active
-        >
+        <span className="mr-2">Tools</span>
+        <span className={`transition-all ${navOpen ? "rotate-180" : ""}`}>
+          <FaChevronUp />
+        </span>
+      </button>
+
+      {/* Navbar Content - collapsible on mobile */}
+      <div
+        className={`${
+          navOpen ? "flex rounded-b-4xl" : "hidden md:flex"
+        } flex-row flex-wrap md:flex-col w-full bg-dark-pink z-10 justify-center md:justify-start items-center p-5
+        md:p-6 gap-2 md:gap-10 md:rounded-r-md transition-all duration-500 ease-in-out`}
+      >
+        <NavButton text="Clear Everything" onClick={onClear} isActive={false}>
           <FaTrash />
         </NavButton>
 
@@ -70,6 +76,7 @@ function Navbar({
         >
           <BsFillEraserFill />
         </NavButton>
+
         <div className="flex md:flex-col flex-row-reverse w-full items-center md:gap-10">
           <div className="flex md:flex-col items-center justify-center w-[30%] md:w-full mb-2 md:mb-0">
             <label className="flex items-center cursor-pointer flex-col justify-center gap-2">
@@ -84,14 +91,13 @@ function Navbar({
               />
               <div
                 className="relative w-9 h-5 md:w-11 md:h-6 bg-white peer-focus:outline-none rounded-full peer
-              peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px]
-              after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 md:after:h-5
-              md:after:w-5 after:transition-all ease-in-out peer-checked:bg-med-pink"
+                peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px]
+                after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 md:after:h-5
+                md:after:w-5 after:transition-all ease-in-out peer-checked:bg-med-pink"
               ></div>
             </label>
           </div>
 
-          {/* Brush Size Slider - takes 70% on mobile */}
           <div className="flex flex-col items-center justify-center w-[70%] md:w-full gap-2">
             <label htmlFor="brush-slider" className="text-white text-sm">
               Brush Size: {brushSize}

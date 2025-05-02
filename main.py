@@ -4,7 +4,7 @@ from PIL import Image, ImageOps
 
 
 def inpaint(img, img_mask, prompt = "natural background, realistic, detailed, seamless continuation",
-            negative_prompt = "blurry, distorted, unrealistic, cartoonish, low quality"):
+            negative_prompt = "blurry, distorted, unrealistic, cartoonish, low quality", img_path = "processed/result.png"):
 
     pipe = StableDiffusionInpaintPipeline.from_single_file(
         "weights/realisticVisionV60B1_v51HyperInpaintVAE.safetensors",
@@ -28,7 +28,7 @@ def inpaint(img, img_mask, prompt = "natural background, realistic, detailed, se
 
     image = image.resize(img.size)
 
-    image.save("edited_output.png")
+    image.save(img_path)
 
 
 def outpaint(img_path, prompt="""expand the landscape naturally, ultra realistic, seamless blending,

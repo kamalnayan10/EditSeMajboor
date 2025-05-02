@@ -5,10 +5,13 @@ import PromptBox from "./PromptBox";
 
 function Main() {
   const [imgSrc, setImgSrc] = useState(null);
+  const [finalImage, setFinalImage] = useState(null);
   const [maskBlob, setMaskBlob] = useState(null);
-  const [brushSize, setBrushSize] = useState(60);
+  const [brushSize, setBrushSize] = useState(10);
+  const [loading, setLoading] = useState(false);
   const [clear, setClear] = useState(false);
   const [isScribble, setIsScribble] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
 
@@ -107,6 +110,10 @@ function Main() {
     setBrushSize(value);
   };
 
+  const handleNavOpen = () => {
+    setNavOpen((n) => !n);
+  };
+
   const handleSubmit = async () => {
     if (!imgSrc || !maskBlob) {
       alert(
@@ -196,29 +203,32 @@ function Main() {
       });
     };
 
-    // Create download links for both files
-    const downloadFile = (blob, filename) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
-
     try {
-      // Download original image
+      setLoading(true);
       const originalBlob = await fetch(imgSrc).then((res) => res.blob());
-      downloadFile(originalBlob, "original_image.png");
-
-      // Process and download mask
       const processedMaskBlob = await processMask(maskBlob);
-      downloadFile(processedMaskBlob, "image_mask.png");
-    } catch (error) {
-      console.error("Error downloading files:", error);
-      alert("Error saving files");
+
+      const formData = new FormData();
+      formData.append("image", originalBlob, "input.png");
+      formData.append("mask", processedMaskBlob, "inputMask.png");
+
+      const uploadRes = await fetch("http://localhost:8000/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await uploadRes.json();
+      const resultUrl = `http://localhost:8000${data.url}`;
+      // Display image
+      setLoading(false);
+      setFinalImage(resultUrl);
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Failed to upload and process.");
     }
   };
 
@@ -232,6 +242,8 @@ function Main() {
         onClear={handleClear}
         scribble={isScribble}
         handleScribble={handleScribble}
+        navOpen={navOpen}
+        handleNavOpen={handleNavOpen}
       />
       <div className="w-full h-full">
         <ImageBox
@@ -242,6 +254,8 @@ function Main() {
           onMaskUpdate={handleMaskUpdate}
           clear={clear}
           onClear={handleClear}
+          loading={loading}
+          finalImage={finalImage}
         />
         <PromptBox
           handleSubmit={handleSubmit}

@@ -9,6 +9,8 @@ function ImageBox({
   onMaskUpdate, // Callback when mask is updated
   clear,
   onClear,
+  loading,
+  finalImage,
 }) {
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -143,7 +145,7 @@ function ImageBox({
   };
 
   const draw = (e) => {
-    if (!isDrawing || !imgSrc) return;
+    if (!isDrawing || !imgSrc || !tool) return;
 
     const canvas = drawingCanvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -237,7 +239,7 @@ function ImageBox({
   };
 
   return (
-    <div className="flex flex-col h-10/12 w-full">
+    <div className="flex flex-col h-16/18 w-full">
       <div
         ref={containerRef}
         className={`
@@ -259,41 +261,50 @@ function ImageBox({
           onChange={handleFileChange}
         />
 
-        {imgSrc ? (
-          <>
-            <canvas
-              ref={imageCanvasRef}
-              className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
-            />
-            <canvas
-              ref={drawingCanvasRef}
-              className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            />
-          </>
-        ) : (
-          <div
-            className="text-gray-500 text-center flex flex-col items-center justify-center p-6 md:p-10
+        {loading || !finalImage ? (
+          imgSrc ? (
+            <>
+              <canvas
+                ref={imageCanvasRef}
+                className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
+              />
+              <canvas
+                ref={drawingCanvasRef}
+                className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
+                onMouseDown={startDrawing}
+                onMouseMove={draw}
+                onMouseUp={stopDrawing}
+                onMouseLeave={stopDrawing}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              />
+            </>
+          ) : (
+            <div
+              className="text-gray-500 text-center flex flex-col items-center justify-center p-6 md:p-10
               border-2 border-dashed border-gray-300 duration-300
               rounded-lg hover:text-med-pink mx-4
               hover:border-med-pink cursor-pointer
               
             "
-          >
-            <BiSolidImageAdd className="text-6xl md:text-8xl lg:text-9xl text-dark-pink" />
-            <p className="text-sm md:text-base lg:text-lg">
-              Drag & drop an image here
-            </p>
-            <p className="text-sm md:text-base lg:text-lg">
-              or click to select
-            </p>
-          </div>
+            >
+              <BiSolidImageAdd className="text-6xl md:text-8xl lg:text-9xl text-dark-pink" />
+              <p className="text-sm md:text-base lg:text-lg">
+                Drag & drop an image here
+              </p>
+              <p className="text-sm md:text-base lg:text-lg">
+                or click to select
+              </p>
+            </div>
+          )
+        ) : finalImage ? (
+          <img
+            src={finalImage}
+            className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
+          ></img>
+        ) : (
+          <canvas></canvas>
         )}
       </div>
     </div>
