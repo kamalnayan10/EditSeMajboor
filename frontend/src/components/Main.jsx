@@ -19,11 +19,6 @@ function Main({
   const [prompt, setPrompt] = useState("");
   const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
   const [position, setPosition] = useState(null);
-  const [sam, setSam] = useState(false);
-
-  const handleSam = (val) => {
-    setSam(val);
-  };
 
   useEffect(() => {
     const CURSORS = {
@@ -329,8 +324,6 @@ function Main({
           finalImage={finalImage}
           handlePosition={handlePosition}
           maskBlob={maskBlob}
-          handleSam={handleSam}
-          sam={sam}
         />
         <PromptBox
           handleSubmit={handleSubmit}

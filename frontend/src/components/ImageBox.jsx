@@ -14,8 +14,6 @@ function ImageBox({
   finalImage,
   handlePosition,
   maskBlob,
-  handleSam,
-  sam,
 }) {
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -58,7 +56,6 @@ function ImageBox({
 
     const canvas = imageCanvasRef.current;
     const ctx = canvas.getContext("2d");
-    handleSam();
     // Read the blob as a data URL
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -91,7 +88,6 @@ function ImageBox({
         ctx.restore();
       };
       img.src = reader.result; // data URL
-      handleSam();
     };
     reader.readAsDataURL(maskBlob);
   }, [maskBlob]); // runs only when your `sam` state changes
