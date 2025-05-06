@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { BiSolidImageAdd } from "react-icons/bi";
+import Loader from "./Loader";
 
 function ImageBox({
   tool,
@@ -11,6 +12,10 @@ function ImageBox({
   onClear,
   loading,
   finalImage,
+  handlePosition,
+  maskBlob,
+  handleSam,
+  sam,
 }) {
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -47,6 +52,49 @@ function ImageBox({
     };
     reader.readAsDataURL(file);
   };
+
+  useEffect(() => {
+    if (!maskBlob || !drawingCanvasRef.current) return;
+
+    const canvas = imageCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    handleSam();
+    // Read the blob as a data URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.onload = () => {
+        // Create an offscreen canvas to sample mask pixels
+        const off = document.createElement("canvas");
+        off.width = img.width;
+        off.height = img.height;
+        const offCtx = off.getContext("2d");
+        offCtx.drawImage(img, 0, 0);
+
+        // Pull out the RGBA data
+        const data = offCtx.getImageData(0, 0, img.width, img.height).data;
+
+        // Compute scale factors from mask-space to display-space
+        const sx = canvas.width / img.width;
+        const sy = canvas.height / img.height;
+
+        // Paint *only* the white mask pixels in yellow@50%
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,0,0.5)";
+        for (let y = 0; y < img.height; y++) {
+          for (let x = 0; x < img.width; x++) {
+            if (data[(y * img.width + x) * 4] === 255) {
+              ctx.fillRect(x * sx, y * sy, sx, sy);
+            }
+          }
+        }
+        ctx.restore();
+      };
+      img.src = reader.result; // data URL
+      handleSam();
+    };
+    reader.readAsDataURL(maskBlob);
+  }, [maskBlob]); // runs only when your `sam` state changes
 
   // Initialize canvases when image loads
   useEffect(() => {
@@ -93,7 +141,7 @@ function ImageBox({
     };
 
     img.src = imgSrc;
-  }, [imgSrc]);
+  }, [imgSrc, loading]);
 
   const updateMask = () => {
     if (!imgSrc || originalDimensionsRef.current.width === 0) return;
@@ -191,6 +239,50 @@ function ImageBox({
     const ctx = canvas.getContext("2d");
     const rect = canvas.getBoundingClientRect();
 
+    if (
+      !imgSrc ||
+      !imageCanvasRef.current ||
+      !drawingCanvasRef.current ||
+      !containerRef.current
+    )
+      return;
+
+    const imageCanvas = imageCanvasRef.current;
+    const drawingCanvas = drawingCanvasRef.current;
+    const container = containerRef.current;
+    const img = new Image();
+
+    img.onload = () => {
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const imgRatio = img.width / img.height;
+      const containerRatio = containerWidth / containerHeight;
+
+      let drawWidth, drawHeight;
+
+      if (imgRatio > containerRatio) {
+        drawWidth = containerWidth;
+        drawHeight = containerWidth / imgRatio;
+      } else {
+        drawHeight = containerHeight;
+        drawWidth = containerHeight * imgRatio;
+      }
+
+      imageCanvas.width = drawingCanvas.width = drawWidth;
+      imageCanvas.height = drawingCanvas.height = drawHeight;
+
+      imageCanvas.style.width = drawingCanvas.style.width = `${drawWidth}px`;
+      imageCanvas.style.height = drawingCanvas.style.height = `${drawHeight}px`;
+
+      const imageCtx = imageCanvas.getContext("2d");
+      imageCtx.drawImage(img, 0, 0, drawWidth, drawHeight);
+
+      const drawingCtx = drawingCanvas.getContext("2d");
+      drawingCtx.clearRect(0, 0, drawWidth, drawHeight);
+    };
+
+    img.src = imgSrc;
+
     ctx.clearRect(0, 0, rect.width, rect.height);
   };
 
@@ -223,7 +315,6 @@ function ImageBox({
   };
 
   const handleTouchMove = (e) => {
-    e.preventDefault();
     const touch = e.touches[0];
     const mouseEvent = {
       clientX: touch.clientX,
@@ -238,8 +329,30 @@ function ImageBox({
     stopDrawing();
   };
 
+  const selectPosition = (e) => {
+    const canvas = drawingCanvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const orig = originalDimensionsRef.current; // { width, height } of your real image
+
+    // pointer inside the CSS‐scaled canvas
+    const xInCanvas = e.clientX - rect.left;
+    const yInCanvas = e.clientY - rect.top;
+
+    // map back to original image coords
+    const x = (xInCanvas / rect.width) * orig.width;
+    const y = (yInCanvas / rect.height) * orig.height;
+
+    handlePosition([x, y]);
+  };
+
+  const handleTouchPosition = (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    selectPosition({ clientX: t.clientX, clientY: t.clientY });
+  };
+
   return (
-    <div className="flex flex-col h-16/18 w-full">
+    <div className="flex flex-col h-16/18 w-full ">
       <div
         ref={containerRef}
         className={`
@@ -261,7 +374,9 @@ function ImageBox({
           onChange={handleFileChange}
         />
 
-        {loading || !finalImage ? (
+        {loading ? (
+          <Loader />
+        ) : !finalImage ? (
           imgSrc ? (
             <>
               <canvas
@@ -271,11 +386,15 @@ function ImageBox({
               <canvas
                 ref={drawingCanvasRef}
                 className="absolute max-h-[90%] max-w-[90%] md:max-h-full md:max-w-full"
-                onMouseDown={startDrawing}
+                onMouseDown={
+                  tool === "selector" ? selectPosition : startDrawing
+                }
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
-                onTouchStart={handleTouchStart}
+                // onMouseLeave={stopDrawing}
+                onTouchStart={
+                  tool === "selector" ? handleTouchPosition : handleTouchStart
+                }
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
               />

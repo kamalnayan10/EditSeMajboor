@@ -3,29 +3,35 @@ import Navbar from "./Navbar";
 import ImageBox from "./ImageBox";
 import PromptBox from "./PromptBox";
 
-function Main() {
-  const [imgSrc, setImgSrc] = useState(null);
-  const [finalImage, setFinalImage] = useState(null);
+function Main({
+  imgSrc,
+  handleImageUpload,
+  finalImage,
+  handleFinalImage,
+  loading,
+  handleLoading,
+}) {
   const [maskBlob, setMaskBlob] = useState(null);
   const [brushSize, setBrushSize] = useState(10);
-  const [loading, setLoading] = useState(false);
   const [clear, setClear] = useState(false);
   const [isScribble, setIsScribble] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [prompt, setPrompt] = useState(null);
+  const [prompt, setPrompt] = useState("");
   const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
+  const [position, setPosition] = useState(null);
+  const [sam, setSam] = useState(false);
+
+  const handleSam = (val) => {
+    setSam(val);
+  };
 
   useEffect(() => {
     const CURSORS = {
       selector: {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <!-- Arrow pointer with dot -->
-                <path d="M10 4L8 4 8 16 4 12 2 14 12 24 14 22 6 14 16 14 16 12 10 12z" 
-                     fill="#e73e6e" opacity="1"/>
-                <circle cx="5" cy="5" r="2" fill="black"/>
+                <circle cx="12" cy="12" r="10" fill="black" opacity="0.4"/>
               </svg>`,
-        hotspot: [1, 1], // Tip of the arrow
-        size: 24, // Fixed size for selector
+        hotspot: [brushSize / 2, brushSize / 2], // Center
       },
       pen: {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -81,16 +87,80 @@ function Main() {
     };
   }, [tool, brushSize]);
 
+  useEffect(() => {
+    if (!position) return;
+
+    const sendPosition = async () => {
+      handleLoading(true);
+      try {
+        const originalBlob = await fetch(imgSrc).then((res) => res.blob());
+
+        const img = new Image();
+        const url = URL.createObjectURL(maskBlob);
+        await new Promise((res) => {
+          img.onload = res;
+          img.src = url;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const [r, g, b] = [d[i], d[i + 1], d[i + 2]];
+          // if originally yellow, keep white; otherwise black
+          const v = r > 200 && g > 200 && b < 100 ? 255 : 0;
+          d[i] = d[i + 1] = d[i + 2] = v;
+          d[i + 3] = 255;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        const processedMaskBlob = await new Promise((res) =>
+          canvas.toBlob(res, "image/png")
+        );
+
+        const formData = new FormData();
+        formData.append("image", originalBlob, "input.png");
+        formData.append("mask", processedMaskBlob, "prev_mask.png");
+        formData.append("x", String(position[0]));
+        formData.append("y", String(position[1]));
+
+        const res = await fetch("http://localhost:8000/generate-mask", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const blob = await res.blob();
+        setMaskBlob(blob);
+      } catch (err) {
+        console.error("Error generating mask:", err);
+        // you could also show a toast or set an error state here
+      } finally {
+        handleLoading(false);
+      }
+    };
+
+    sendPosition();
+  }, [position]);
+
+  const handlePosition = ([x, y]) => {
+    setPosition([x, y]);
+  };
+
   const handleClear = (c) => {
     setClear(c);
   };
 
   const handleScribble = () => {
     setIsScribble((scribble) => !scribble);
-  };
-
-  const handleImageUpload = (imageData) => {
-    setImgSrc(imageData.src);
   };
 
   const handlePrompt = (e) => {
@@ -204,7 +274,7 @@ function Main() {
     };
 
     try {
-      setLoading(true);
+      handleLoading(true);
       const originalBlob = await fetch(imgSrc).then((res) => res.blob());
       const processedMaskBlob = await processMask(maskBlob);
 
@@ -225,8 +295,8 @@ function Main() {
       const data = await uploadRes.json();
       const resultUrl = `http://localhost:8000${data.url}`;
       // Display image
-      setLoading(false);
-      setFinalImage(resultUrl);
+      handleLoading(false);
+      handleFinalImage(resultUrl);
     } catch (err) {
       console.error("Upload error:", err);
       alert("Failed to upload and process.");
@@ -257,6 +327,10 @@ function Main() {
           onClear={handleClear}
           loading={loading}
           finalImage={finalImage}
+          handlePosition={handlePosition}
+          maskBlob={maskBlob}
+          handleSam={handleSam}
+          sam={sam}
         />
         <PromptBox
           handleSubmit={handleSubmit}
