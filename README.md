@@ -130,12 +130,12 @@ curl -X POST \
 
 The `example` folder contains three files that demonstrate the workflow:
 
-* `input.pong`: the original input image
-* `inputMask.pong`: initial mask highlighting the region of interest
+* `input.png`: the original input image
+* `inputMask.png`: initial mask highlighting the region of interest
 * `output.png`: final result after inpainting
 
-![Original Input](example/input.pong)
-![Input Mask](example/inputMask.pong)
+![Original Input](example/input.png)
+![Input Mask](example/inputMask.png)
 ![Inpainted Output](example/output.png)
 
 ---
