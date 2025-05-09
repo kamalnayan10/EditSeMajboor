@@ -28,12 +28,10 @@ async def upload_image(
     mask: UploadFile = File(...),
     prompt: str = Form(None),
 ):
-    # Save original image
     image_path = os.path.join(UPLOAD_DIR, image.filename)
     with open(image_path, "wb") as f:
         shutil.copyfileobj(image.file, f)
 
-    # Save mask
     mask_path = os.path.join(UPLOAD_DIR, mask.filename)
     with open(mask_path, "wb") as f:
         shutil.copyfileobj(mask.file, f)
@@ -62,7 +60,7 @@ async def upload_image(
 
     mask_img = generate_mask(image_path, mask_path, float(x), float(y))
 
-    # 3) stream it back
+    # stream image back
     buf = io.BytesIO()
     mask_img.save(buf, format="PNG")
     buf.seek(0)

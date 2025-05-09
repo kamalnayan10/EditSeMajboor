@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+torch
+diffusers
+transformers
+accelerate
+safetensors
+numpy
+pillow
+python-multipart
+aiofiles
+xformers
+sam2

@@ -15,7 +15,6 @@ function NavButton({ text, onClick, children, isActive = false }) {
         <div className="md:text-4xl text-3xl">{children}</div>
       </button>
 
-      {/* absolutely‐positioned tooltip */}
       <span
         className="absolute left-full top-1/2 -translate-y-1/2 h-full md:flex justify-center items-center
                bg-[#c31849] text-white  rounded-lg px-3 py-1 text-xl

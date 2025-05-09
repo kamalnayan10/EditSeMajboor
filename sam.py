@@ -2,13 +2,12 @@ import torch
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 
-from PIL import Image, ImageChops
+from PIL import Image
 import numpy as np
-import matplotlib.pyplot as plt
 
 def generate_mask(img_path, mask_path, x, y):
-    checkpoint = "weights/sam2.1_hiera_large.pt"
-    model_cfg = "E:/PROGRAMMING/PYTHON/img_edit/weights/sam2.1_hiera_l.yaml"
+    checkpoint = "weights/sam2.1_hiera_large.pt" # path to checkpoint sam_2.1-hiera.pt
+    model_cfg = "E:/PROGRAMMING/PYTHON/img_edit/weights/sam2.1_hiera_l.yaml" # path to sam_config.yml
     predictor = SAM2ImagePredictor(build_sam2(model_cfg, checkpoint))
 
     image = Image.open(img_path)
@@ -30,13 +29,13 @@ def generate_mask(img_path, mask_path, x, y):
     gen_arr  = np.array(gen_mask, dtype=np.uint8)
     combined_arr = np.maximum(prev_arr, gen_arr)
 
-    # 5) return as PIL image
+    # return as PIL image
     combined = Image.fromarray(combined_arr, mode="L")
 
     return combined
 
 if __name__ == "__main__":
-    IMG_PATH = "E:/PROGRAMMING/PYTHON/img_edit/images/building.jpg"
+    IMG_PATH = "images/building.jpg"
     POINTS = [470,395]
 
     mask = generate_mask(IMG_PATH, POINTS[0], POINTS[1])

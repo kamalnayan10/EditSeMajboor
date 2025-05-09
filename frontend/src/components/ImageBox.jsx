@@ -5,9 +5,9 @@ import Loader from "./Loader";
 function ImageBox({
   tool,
   brushSize,
-  imgSrc, // Receive image source from parent
-  onImageUpload, // Callback when image is uploaded
-  onMaskUpdate, // Callback when mask is updated
+  imgSrc,
+  onImageUpload,
+  onMaskUpdate,
   clear,
   onClear,
   loading,
@@ -58,15 +58,11 @@ function ImageBox({
     const canvas = drawingCanvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    // 1) CLEAR the old highlight each time
-    // ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 2) Read and draw the new mask
+    // draw the new mask
     const reader = new FileReader();
     reader.onloadend = () => {
       const img = new Image();
       img.onload = () => {
-        // offscreen to sample mask
         const off = document.createElement("canvas");
         off.width = img.width;
         off.height = img.height;
@@ -83,7 +79,6 @@ function ImageBox({
           for (let y = 0; y < img.height; y++) {
             for (let x = 0; x < img.width; x++) {
               if (data[(y * img.width + x) * 4] === 255) {
-                // map mask coords → canvas coords
                 ctx.fillRect(x * sx, y * sy, sx, sy);
               }
             }
@@ -93,7 +88,6 @@ function ImageBox({
           for (let y = 0; y < img.height; y++) {
             for (let x = 0; x < img.width; x++) {
               if (data[(y * img.width + x) * 4] === 255) {
-                // map mask coords → canvas coords
                 ctx.fillRect(x, y, sx, sy);
               }
             }
@@ -107,7 +101,7 @@ function ImageBox({
     reader.readAsDataURL(maskBlob);
   }, [maskBlob]);
 
-  // Initialize canvases when image loads
+  // Initialise canvases when image loads
   useEffect(() => {
     if (
       !imgSrc ||
@@ -402,7 +396,6 @@ function ImageBox({
                 }
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
-                // onMouseLeave={stopDrawing}
                 onTouchStart={
                   tool === "selector" ? handleTouchPosition : handleTouchStart
                 }

@@ -1,8 +1,6 @@
 from diffusers import StableDiffusionInpaintPipeline
 import torch
-from PIL import Image,ImageOps
-import cv2
-import numpy as np
+from PIL import Image
 
 def inpaint(img, img_mask, prompt = "empty natural background, seamless continuation, realistic scenery, background only, high detail, environment matching surrounding context",
             negative_prompt = "people, person, human, character, figure, face, body, text, animal, unnatural patterns, artifacts, distortion, blurry, duplicate, watermark, unrealistic",
@@ -14,6 +12,7 @@ def inpaint(img, img_mask, prompt = "empty natural background, seamless continua
         use_safetensors=True,
     ).to("cuda")
 
+    # model optimisation functions
     pipe.enable_model_cpu_offload()  # Offloads unused components to CPU
     pipe.enable_vae_slicing()        # Processes VAE in slices
     pipe.enable_vae_tiling()         # Processes VAE in tiles
@@ -46,15 +45,12 @@ def inpaint(img, img_mask, prompt = "empty natural background, seamless continua
     # Composite result: Only apply changes inside mask
     final_image = Image.composite(image, img, img_mask)
 
-    # Save the final composited image
     final_image.save(img_path)
 
-    # image.save(img_path)
 
 if __name__ == "__main__":
-    IMG_PATH = "uploads/input.png"
-    IMG_MASK_PATH = "uploads/inputMask.png"
-    PROMPT = "sun in sky"
+    IMG_PATH = "images/building.jpg"
+    IMG_MASK_PATH = "images/buildingMask.png"
+    PROMPT = "add a football stadium"
 
-    # instructPix2Pix(IMG_PATH, PROMPT)
     inpaint(IMG_PATH,IMG_MASK_PATH, PROMPT)

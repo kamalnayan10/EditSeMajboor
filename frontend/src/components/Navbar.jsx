@@ -4,8 +4,6 @@ import { FaTrash, FaMagic, FaHighlighter } from "react-icons/fa";
 import { BsFillEraserFill } from "react-icons/bs";
 import { FaChevronUp } from "react-icons/fa";
 
-// change highlighter tool into two - replace(anything inside mask gets edited) and preserve(anything outside mask gets edited)
-
 function Navbar({
   tool,
   changeTool,
@@ -17,7 +15,6 @@ function Navbar({
 }) {
   return (
     <div className="bg-light-pink md:bg-dark-pink p-3 w-full md:w-1/3 lg:w-1/8 md:h-full">
-      {/* Mobile Toggle Button - always visible on mobile */}
       <button
         onClick={handleNavOpen}
         className={` ${navOpen ? "rounded-t-4xl" : "rounded-4xl"}
@@ -29,7 +26,6 @@ function Navbar({
         </span>
       </button>
 
-      {/* Navbar Content - collapsible on mobile */}
       <div
         className={`${
           navOpen ? "flex rounded-b-4xl" : "hidden md:flex"

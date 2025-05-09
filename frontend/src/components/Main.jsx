@@ -56,7 +56,7 @@ function Main({
 
     if (["pen", "highlighter", "eraser", "selector"].includes(tool)) {
       const cursor = CURSORS[tool];
-      const size = tool === "selector" ? 30 : brushSize; // Only eraser uses brushSize
+      const size = tool === "selector" ? 30 : brushSize;
 
       let style = document.getElementById(styleId);
       if (!style) {
@@ -145,7 +145,6 @@ function Main({
         setMaskBlob(blob);
       } catch (err) {
         console.error("Error generating mask:", err);
-        // you could also show a toast or set an error state here
       } finally {
         handleLoading(false);
       }
@@ -222,7 +221,7 @@ function Main({
             data[i] = val;
             data[i + 1] = val;
             data[i + 2] = val;
-            data[i + 3] = 255; // Force full opacity// Put the processed data back
+            data[i + 3] = 255;
           }
 
           ctx.putImageData(imageData, 0, 0);
