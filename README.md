@@ -6,13 +6,13 @@
 
 ### 🔍 Features
 
-- **Object Removal**: Remove selected objects cleanly using Stable Diffusion inpainting.
-- **Content Addition**: Generate and insert new content into highlighted regions.
-- **Prompt Box**: Enter custom prompts to guide inpainting results.
-- **SAM2 Auto‐Selection**: Click on the image to auto‐generate precise masks powered by SAM2.
-- **Interactive Frontend**: Built with Vite, React, and Tailwind CSS for a fast, responsive UI.
-- **FastAPI Backend**: Exposes RESTful API endpoints for inpainting and mask generation.
-- **Modular Architecture**: Easily extendable with custom models or services.
+* **Object Removal**: Remove selected objects cleanly using Stable Diffusion inpainting.
+* **Content Addition**: Generate and insert new content into highlighted regions.
+* **Prompt Box**: Enter custom prompts to guide inpainting results.
+* **SAM2 Auto‐Selection**: Click on the image to auto‐generate precise masks powered by SAM2.
+* **Interactive Frontend**: Built with Vite, React, and Tailwind CSS for a fast, responsive UI.
+* **FastAPI Backend**: Exposes RESTful API endpoints for inpainting and mask generation.
+* **Modular Architecture**: Easily extendable with custom models or services.
 
 ---
 
@@ -24,6 +24,31 @@
 | Backend          | FastAPI · Uvicorn           |
 | Inpainting Model | Stable Diffusion            |
 | Language         | JavaScript · Python         |
+
+---
+
+### 📂 Model Weights
+
+Place pretrained model checkpoints in a `weights/` folder at the project root:
+
+* **SAM2 (Segment Anything Model v2)**
+
+  * Download from [facebook/sam2-hiera-large on Hugging Face](https://huggingface.co/facebook/sam2-hiera-large/tree/main)
+  * Required files: `sam2_hiera_large.pt` and the corresponding YAML config (e.g. `sam2_hiera_l.yaml`)
+
+* **Stable Diffusion Inpainting**
+
+  * Download version 1464918 from [CivitAI model #15003](https://civitai.com/models/15003?modelVersionId=1464918)
+  * Required file: `cyberrealistic_v80Inpainting.safetensors`
+
+Your `weights/` directory should look like:
+
+```plaintext
+weights/
+├── sam2_hiera_large.pt
+├── sam2_hiera_l.yaml
+└── cyberrealistic_v80Inpainting.safetensors
+```
 
 ---
 
@@ -54,10 +79,10 @@ Open your browser at `http://localhost:5173` (or the port reported by Vite).
 In the project root:
 
 ```bash
-# Create and activate a venv(optional but recommended)
+# Create and activate a venv (optional but recommended)
 python -m venv editEnv
 source editEnv/bin/activate   # Linux/macOS
-.\editEnv\Scripts\activate    # Windows
+.\editEnv\Scripts\activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
@@ -103,16 +128,15 @@ curl -X POST \
 
 ### 📦 Example Images
 
-The `example/` folder contains:
+The `example` folder contains three files that demonstrate the workflow:
 
-- `input.png` – the original input  
-  ![Original Input](example/input.png)
+* `input.pong`: the original input image
+* `inputMask.pong`: initial mask highlighting the region of interest
+* `output.png`: final result after inpainting
 
-- `inputMask.png` – initial mask  
-  ![Input Mask](example/inputMask.png)
-
-- `output.png` – final result after inpainting  
-  ![Inpainted Output](example/output.png)
+![Original Input](example/input.pong)
+![Input Mask](example/inputMask.pong)
+![Inpainted Output](example/output.png)
 
 ---
 
