@@ -8,6 +8,8 @@
 
 - **Object Removal**: Remove selected objects cleanly using Stable Diffusion inpainting.
 - **Content Addition**: Generate and insert new content into highlighted regions.
+- **Prompt Box**: Enter custom prompts to guide inpainting results.
+- **SAM2 Auto‐Selection**: Click on the image to auto‐generate precise masks powered by SAM2.
 - **Interactive Frontend**: Built with Vite, React, and Tailwind CSS for a fast, responsive UI.
 - **FastAPI Backend**: Exposes RESTful API endpoints for inpainting and mask generation.
 - **Modular Architecture**: Easily extendable with custom models or services.
@@ -96,6 +98,21 @@ curl -X POST \
   -F "x=150" \
   -F "y=200" > refined_mask.png
 ```
+
+---
+
+### 📦 Example Images
+
+The `example/` folder contains:
+
+- `input.png` – the original input  
+  ![Original Input](example/input.png)
+
+- `inputMask.png` – initial mask  
+  ![Input Mask](example/inputMask.png)
+
+- `output.png` – final result after inpainting  
+  ![Inpainted Output](example/output.png)
 
 ---
 
