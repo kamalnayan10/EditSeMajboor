@@ -1,7 +1,7 @@
 import React from "react";
 import { MdAdd } from "react-icons/md";
 import { HiMiniScissors } from "react-icons/hi2";
-import { PiCursor } from "react-icons/pi";
+import { PiCursorFill } from "react-icons/pi";
 
 function Header({ finalImage, downloadFinalImage, handleNewImage }) {
   return (
@@ -12,7 +12,7 @@ function Header({ finalImage, downloadFinalImage, handleNewImage }) {
       <h1 className="font-roboto text-3xl sm:text-4xl lg:text-5xl text-dark-pink font-extrabold flex items-center">
         <HiMiniScissors className="text-2xl sm:text-3xl lg:text-4xl rotate-300" />
         Edit <span className="text-white">से</span>Majboor
-        <PiCursor className="text-2xl sm:text-3xl lg:text-4xl" />
+        <PiCursorFill className="text-2xl sm:text-3xl lg:text-4xl text-white" />
       </h1>
       <div className="flex gap-2 sm:gap-4">
         <button

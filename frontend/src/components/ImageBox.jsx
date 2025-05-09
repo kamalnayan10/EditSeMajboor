@@ -14,6 +14,8 @@ function ImageBox({
   finalImage,
   handlePosition,
   maskBlob,
+  sam,
+  handleSam,
 }) {
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -53,44 +55,57 @@ function ImageBox({
 
   useEffect(() => {
     if (!maskBlob || !drawingCanvasRef.current) return;
-
-    const canvas = imageCanvasRef.current;
+    const canvas = drawingCanvasRef.current;
     const ctx = canvas.getContext("2d");
-    // Read the blob as a data URL
+
+    // 1) CLEAR the old highlight each time
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 2) Read and draw the new mask
     const reader = new FileReader();
     reader.onloadend = () => {
       const img = new Image();
       img.onload = () => {
-        // Create an offscreen canvas to sample mask pixels
+        // offscreen to sample mask
         const off = document.createElement("canvas");
         off.width = img.width;
         off.height = img.height;
         const offCtx = off.getContext("2d");
         offCtx.drawImage(img, 0, 0);
 
-        // Pull out the RGBA data
         const data = offCtx.getImageData(0, 0, img.width, img.height).data;
-
-        // Compute scale factors from mask-space to display-space
         const sx = canvas.width / img.width;
         const sy = canvas.height / img.height;
 
-        // Paint *only* the white mask pixels in yellow@50%
         ctx.save();
-        ctx.fillStyle = "rgba(255,255,0,0.5)";
-        for (let y = 0; y < img.height; y++) {
-          for (let x = 0; x < img.width; x++) {
-            if (data[(y * img.width + x) * 4] === 255) {
-              ctx.fillRect(x * sx, y * sy, sx, sy);
+        ctx.fillStyle = "rgba(255,255,0,1)";
+        if (sam) {
+          for (let y = 0; y < img.height; y++) {
+            for (let x = 0; x < img.width; x++) {
+              if (data[(y * img.width + x) * 4] === 255) {
+                // map mask coords → canvas coords
+                ctx.fillRect(x * sx, y * sy, sx, sy);
+              }
+            }
+          }
+          handleSam(false);
+        } else {
+          for (let y = 0; y < img.height; y++) {
+            for (let x = 0; x < img.width; x++) {
+              if (data[(y * img.width + x) * 4] === 255) {
+                // map mask coords → canvas coords
+                ctx.fillRect(x, y, sx, sy);
+              }
             }
           }
         }
+
         ctx.restore();
       };
-      img.src = reader.result; // data URL
+      img.src = reader.result;
     };
     reader.readAsDataURL(maskBlob);
-  }, [maskBlob]); // runs only when your `sam` state changes
+  }, [maskBlob]);
 
   // Initialize canvases when image loads
   useEffect(() => {

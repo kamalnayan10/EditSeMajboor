@@ -1,6 +1,8 @@
 from diffusers import StableDiffusionInpaintPipeline
 import torch
-from PIL import Image
+from PIL import Image,ImageOps
+import cv2
+import numpy as np
 
 def inpaint(img, img_mask, prompt = "empty natural background, seamless continuation, realistic scenery, background only, high detail, environment matching surrounding context",
             negative_prompt = "people, person, human, character, figure, face, body, text, animal, unnatural patterns, artifacts, distortion, blurry, duplicate, watermark, unrealistic",
@@ -50,11 +52,9 @@ def inpaint(img, img_mask, prompt = "empty natural background, seamless continua
     # image.save(img_path)
 
 if __name__ == "__main__":
-    IMG_PATH = "E:/PROGRAMMING/PYTHON/img_edit/images/building.jpg"
-    IMG_MASK_PATH = "E:/PROGRAMMING/PYTHON/img_edit/images/buildingMask.png"
-    PROMPT = "add a yellow flower"
+    IMG_PATH = "uploads/input.png"
+    IMG_MASK_PATH = "uploads/inputMask.png"
+    PROMPT = "sun in sky"
 
     # instructPix2Pix(IMG_PATH, PROMPT)
     inpaint(IMG_PATH,IMG_MASK_PATH, PROMPT)
-    # inpaint_external(IMG_PATH,IMG_MASK_PATH, PROMPT)
-    # outpaint(IMG_PATH)

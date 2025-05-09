@@ -14,11 +14,15 @@ function Main({
   const [maskBlob, setMaskBlob] = useState(null);
   const [brushSize, setBrushSize] = useState(10);
   const [clear, setClear] = useState(false);
-  const [isScribble, setIsScribble] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
-  const [tool, setTool] = useState(""); // can have values - pen, highlighter, selector, eraser
+  const [tool, setTool] = useState(""); // can have values - highlighter, selector, eraser
   const [position, setPosition] = useState(null);
+  const [sam, setSam] = useState(false);
+
+  const handleSam = (val) => {
+    setSam(val);
+  };
 
   useEffect(() => {
     const CURSORS = {
@@ -90,6 +94,10 @@ function Main({
       try {
         const originalBlob = await fetch(imgSrc).then((res) => res.blob());
 
+        if (!(maskBlob instanceof Blob)) {
+          console.error("Invalid maskBlob provided");
+          return null;
+        }
         const img = new Image();
         const url = URL.createObjectURL(maskBlob);
         await new Promise((res) => {
@@ -144,6 +152,7 @@ function Main({
     };
 
     sendPosition();
+    handleSam(true);
   }, [position]);
 
   const handlePosition = ([x, y]) => {
@@ -152,10 +161,6 @@ function Main({
 
   const handleClear = (c) => {
     setClear(c);
-  };
-
-  const handleScribble = () => {
-    setIsScribble((scribble) => !scribble);
   };
 
   const handlePrompt = (e) => {
@@ -199,62 +204,27 @@ function Main({
           canvas.height = img.height;
           const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-          // Draw the image
           ctx.drawImage(img, 0, 0);
 
           // Get image data
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = imageData.data;
 
-          if (!isScribble) {
-            // Process each pixel
-            for (let i = 0; i < data.length; i += 4) {
-              const r = data[i];
-              const g = data[i + 1];
-              const b = data[i + 2];
-              const a = data[i + 3]; // alpha channel
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3]; // alpha channel
 
-              // Enhanced yellow detection (strict RGB ranges for yellow)
-              // Yellow typically has high R+G and low B, with possible transparency
-              const isYellow =
-                r >= 200 && // High red
-                g >= 200 && // High green
-                b <= 100 && // Low blue
-                a > 50; // Not too transparent
+            const isYellow = r >= 200 && g >= 200 && b <= 100 && a > 50;
 
-              // Set to pure white or pure black
-              const val = isYellow ? 255 : 0;
-              data[i] = val; // R
-              data[i + 1] = val; // G
-              data[i + 2] = val; // B
-              data[i + 3] = 255; // Force full opacity
-            }
-          } else {
-            // Process each pixel
-            for (let i = 0; i < data.length; i += 4) {
-              const r = data[i];
-              const g = data[i + 1];
-              const b = data[i + 2];
-              const a = data[i + 3]; // alpha channel
-
-              // Enhanced yellow detection (strict RGB ranges for yellow)
-              // Yellow typically has high R+G and low B, with possible transparency
-              const isRed =
-                r >= 200 && // High red
-                g <= 100 && // High green
-                b <= 100 && // Low blue
-                a > 50; // Not too transparent
-
-              // Set to pure white or pure black
-              const val = isRed ? 255 : 0;
-              data[i] = val; // R
-              data[i + 1] = val; // G
-              data[i + 2] = val; // B
-              data[i + 3] = 255; // Force full opacity
-            }
+            const val = isYellow ? 255 : 0;
+            data[i] = val;
+            data[i + 1] = val;
+            data[i + 2] = val;
+            data[i + 3] = 255; // Force full opacity// Put the processed data back
           }
 
-          // Put the processed data back
           ctx.putImageData(imageData, 0, 0);
 
           // Convert back to blob
@@ -306,8 +276,6 @@ function Main({
         brushSize={brushSize}
         changeBrushSize={changeBrushSize}
         onClear={handleClear}
-        scribble={isScribble}
-        handleScribble={handleScribble}
         navOpen={navOpen}
         handleNavOpen={handleNavOpen}
       />
@@ -324,6 +292,8 @@ function Main({
           finalImage={finalImage}
           handlePosition={handlePosition}
           maskBlob={maskBlob}
+          sam={sam}
+          handleSam={handleSam}
         />
         <PromptBox
           handleSubmit={handleSubmit}
