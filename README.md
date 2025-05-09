@@ -6,13 +6,13 @@
 
 ### 🔍 Features
 
-* **Object Removal**: Remove selected objects cleanly using Stable Diffusion inpainting.
-* **Content Addition**: Generate and insert new content into highlighted regions.
-* **Prompt Box**: Enter custom prompts to guide inpainting results.
-* **SAM2 Auto‐Selection**: Click on the image to auto‐generate precise masks powered by SAM2.
-* **Interactive Frontend**: Built with Vite, React, and Tailwind CSS for a fast, responsive UI.
-* **FastAPI Backend**: Exposes RESTful API endpoints for inpainting and mask generation.
-* **Modular Architecture**: Easily extendable with custom models or services.
+- **Object Removal**: Remove selected objects cleanly using Stable Diffusion inpainting.
+- **Content Addition**: Generate and insert new content into highlighted regions.
+- **Prompt Box**: Enter custom prompts to guide inpainting results.
+- **SAM2 Auto‐Selection**: Click on the image to auto‐generate precise masks powered by SAM2.
+- **Interactive Frontend**: Built with Vite, React, and Tailwind CSS for a fast, responsive UI.
+- **FastAPI Backend**: Exposes RESTful API endpoints for inpainting and mask generation.
+- **Modular Architecture**: Easily extendable with custom models or services.
 
 ---
 
@@ -31,22 +31,22 @@
 
 Place pretrained model checkpoints in a `weights/` folder at the project root:
 
-* **SAM2 (Segment Anything Model v2)**
+- **SAM2 (Segment Anything Model v2)**
 
-  * Download from [facebook/sam2-hiera-large on Hugging Face](https://huggingface.co/facebook/sam2-hiera-large/tree/main)
-  * Required files: `sam2_hiera_large.pt` and the corresponding YAML config (e.g. `sam2_hiera_l.yaml`)
+  - Download from [facebook/sam2-hiera-large on Hugging Face](https://huggingface.co/facebook/sam2-hiera-large/tree/main)
+  - Required files: `sam2-hiera-large.pt` and the corresponding YAML config (e.g. `sam2-hiera-large.yaml`)
 
-* **Stable Diffusion Inpainting**
+- **Stable Diffusion Inpainting**
 
-  * Download version 1464918 from [CivitAI model #15003](https://civitai.com/models/15003?modelVersionId=1464918)
-  * Required file: `cyberrealistic_v80Inpainting.safetensors`
+  - Download version 1464918 from [CivitAI model #15003](https://civitai.com/models/15003?modelVersionId=1464918)
+  - Required file: `cyberrealistic_v80Inpainting.safetensors`
 
 Your `weights/` directory should look like:
 
 ```plaintext
 weights/
-├── sam2_hiera_large.pt
-├── sam2_hiera_l.yaml
+├── sam2-hiera-large.pt
+├── sam2-hiera-large.yaml
 └── cyberrealistic_v80Inpainting.safetensors
 ```
 
@@ -128,15 +128,26 @@ curl -X POST \
 
 ### 📦 Example Images
 
-The `example` folder contains three files that demonstrate the workflow:
+The `example/` folder contains:
 
-* `input.png`: the original input image
-* `inputMask.png`: initial mask highlighting the region of interest
-* `output.png`: final result after inpainting
+- `input.png`: the original input image
+- `inputMask.png`: initial mask highlighting the region of interest
+- `output.png`: final result after inpainting
 
-![Original Input](example/input.png)
-![Input Mask](example/inputMask.png)
-![Inpainted Output](example/output.png)
+<!-- display input, mask, output side by side -->
+
+<p float="left">
+  <img src="example/input.png" width="200" />
+  <img src="example/inputMask.png" width="200" />
+  <img src="example/output.png" width="200" />
+</p>
+
+**UI Screenshots** (Desktop & Mobile):
+
+<p float="left">
+  <img src="example/ui-desktop.png" width="300" />
+  <img src="example/ui-mobile.png" width="150" />
+</p>
 
 ---
 
