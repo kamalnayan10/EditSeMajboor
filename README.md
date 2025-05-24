@@ -45,8 +45,8 @@ Your `weights/` directory should look like:
 
 ```plaintext
 weights/
-├── sam2-hiera-large.pt
-├── sam2-hiera-large.yaml
+├── sam2_hiera_large.pt
+├── sam2_hiera_l.yaml
 └── cyberrealistic_v80Inpainting.safetensors
 ```
 
@@ -60,8 +60,8 @@ Follow these steps to run the frontend and backend locally.
 
 ```bash
 # Clone the project
-git clone https://github.com/your-username/deepart-image-editor.git
-cd deepart-image-editor
+git clone https://github.com/kamalnayan10/EditSeMajboor.git
+cd EditSeMajboor
 ```
 
 #### 2. Run the Frontend
